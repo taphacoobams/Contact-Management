@@ -1,18 +1,18 @@
-from fastapi import APIRouter, Body, Depends, Header, Request
+from fastapi import APIRouter, Header, Request, Depends, Body
 from fastapi.responses import RedirectResponse
 import stripe
 from firebase_admin import auth
 from database.firebase import db
 from routers.router_auth import get_current_user
-router = APIRouter(
-      tags=["Stripe"],
-      prefix='/stripe'
-)
-  
-# This is your test secret API key.
 from dotenv import dotenv_values
-config = dotenv_values(".env")
-stripe.api_key = config['STRIPE_SK']
+
+router = APIRouter(
+    tags=["Stripe"],
+    prefix='/stripe'
+)
+
+# Votre test secret API Key
+stripe.api_key= 'sk_test_51OA7iPCnvtvx8aFI4QrKivrvcsffMruSkSQb2odifm1mMCNPpaJL5sqcWpY7kOFIGxkiUq54aWMgfJqMSV03jGT800pWyZZV5k'
 
 YOUR_DOMAIN = 'http://localhost'
 
@@ -22,36 +22,36 @@ async def stripe_checkout():
         checkout_session = stripe.checkout.Session.create(
             line_items=[
                 {
-                    # Provide the exact Price ID (for example, pr_1234) of the product you want to sell
-                    'price': 'price_1O4KaQDeNOaTDGEGg4CeNuUE',
+                    # PRICE ID du produit que vous vouler vendre
+                    'price':'price_1OA8tlCnvtvx8aFI5WwXYSod',
+                    'quantity' : 1,
                 },
             ],
             mode='subscription',
             payment_method_types=['card'],
-            success_url=YOUR_DOMAIN + '/stripe/success', # à modif par u noveau endpoint pour ajouter le success -> webhook
-            cancel_url=YOUR_DOMAIN + '/stripe/cancel',
-            client_reference_id= "client_reference_id102312301230"
+            success_url=YOUR_DOMAIN + '/success.html',
+            cancel_url=YOUR_DOMAIN + '/cancel.html',
         )
         # return checkout_session
         response = RedirectResponse(url=checkout_session['url'])
         return response
     except Exception as e:
         return str(e)
-
+    
 @router.post('/webhook')
-async def webhook_received(request: Request, stripe_signature: str = Header(None)):
-    webhook_secret = "whsec_79e4b26c08ab814541cc335a27bcf4ab91528a352b1c95de244660d456a70a23"
+async def webhook_received(request:Request, stripe_signature: str = Header (None)):
+    webhook_secret = "whsec_c17400b9ae2294360f3e7e70895830fc54b01140bf5b1405c3f4954be5c05c7c"
     data = await request.body()
     try:
         event = stripe.Webhook.construct_event(
-            payload=data,
+            payload = data,
             sig_header=stripe_signature,
             secret=webhook_secret
         )
-        event_data = event['data']
+        event_data =event['data']
     except Exception as e:
-        return {"error": str(e)}
-    print(event_data)
+        return  {"error":str(e)}
+    
     event_type = event['type']
     if event_type == 'checkout.session.completed':
         print('checkout session completed')
@@ -65,11 +65,10 @@ async def webhook_received(request: Request, stripe_signature: str = Header(None
 
     elif event_type == 'invoice.payment_failed':
         print('invoice payment failed')
-    # else:
-        # print(f'unhandled event: {event_type}')
+    else:
+        print(f'unhandled event: {event_type}')
 
     return {"status": "success"}
-
 
 @router.get('/usage')
 async def stripe_usage(userData: int = Depends(get_current_user)):
