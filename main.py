@@ -5,7 +5,7 @@ from documentation.description import api_description
 from documentation.tags import tags_metadata
 
 #Routers
-import routers.router_contacts, routers.router_auth
+import routers.router_contacts, routers.router_auth, routers.router_stripe
 
 app = FastAPI(
     title = "Contact Management",
@@ -15,3 +15,4 @@ app = FastAPI(
 
 app.include_router(routers.router_contacts.router)
 app.include_router(routers.router_auth.router)
+app.include_router(routers.router_stripe.router)
