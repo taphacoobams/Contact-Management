@@ -47,7 +47,7 @@ async def modify_contact_name(contact_id: str, modifiedContact: ContactNoID, use
             "last_name": modifiedContact.last_name,
             "email": modifiedContact.email,
             "phone_number": modifiedContact.phone_number,
-            "adress": modifiedContact.adress  # Correction de "adress" à "address"
+            "adress": modifiedContact.adress  
         }
         
         db.child("users").child(userData['uid']).child('contact').child(contact_id).update(updatedContact, userData['idToken'])

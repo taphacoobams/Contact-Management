@@ -11,7 +11,6 @@ router = APIRouter(
     prefix='/stripe'
 )
 
-# Votre test secret API Key
 stripe.api_key= 'sk_test_51OA7iPCnvtvx8aFI4QrKivrvcsffMruSkSQb2odifm1mMCNPpaJL5sqcWpY7kOFIGxkiUq54aWMgfJqMSV03jGT800pWyZZV5k'
 
 YOUR_DOMAIN = 'http://localhost'
@@ -29,8 +28,8 @@ async def stripe_checkout():
             ],
             mode='subscription',
             payment_method_types=['card'],
-            success_url=YOUR_DOMAIN + '/success.html',
-            cancel_url=YOUR_DOMAIN + '/cancel.html',
+            success_url=YOUR_DOMAIN + '/stripe/success', 
+            cancel_url=YOUR_DOMAIN + '/stripe/cancel',
         )
         # return checkout_session
         response = RedirectResponse(url=checkout_session['url'])
